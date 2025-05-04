@@ -30,6 +30,13 @@ spec:
           volumeMounts:
             - mountPath: /data/db
               name: mongo-storage
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
       restartPolicy: Always
       volumes:
         - name: mongo-storage
