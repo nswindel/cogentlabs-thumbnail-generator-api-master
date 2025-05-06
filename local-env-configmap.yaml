@@ -10,5 +10,5 @@ data:
 kind: ConfigMap
 metadata:
   labels:
-    io.kompose.service: api-local-env
+    app: api-local-env
   name: local-env

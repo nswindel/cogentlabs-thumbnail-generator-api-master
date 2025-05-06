@@ -34,5 +34,5 @@ data:
 kind: ConfigMap
 metadata:
   labels:
-    io.kompose.service: db
+    app: db
   name: db-cm0

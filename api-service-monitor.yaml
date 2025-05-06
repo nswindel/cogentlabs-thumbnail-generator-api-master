@@ -8,7 +8,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      io.kompose.service: api
+      app: api
   endpoints:
     - port: http
       interval: 60s

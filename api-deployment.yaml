@@ -1,30 +1,35 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -f docker-compose.yaml
-    kompose.version: 1.35.0 (9532ceef3)
   labels:
-    io.kompose.service: api
+    app: api
   name: api
   namespace: default
 spec:
   replicas: 2
   selector:
     matchLabels:
-      io.kompose.service: api
+      app: api
   template:
     metadata:
-      annotations:
-        kompose.cmd: kompose convert -f docker-compose.yaml
-        kompose.version: 1.35.0 (9532ceef3)
       labels:
-        io.kompose.service: api
+        app: api
     spec:
       containers:
         - name: api
           image: thumbnail-api:latest
           imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+              name: http
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
           env:
             - name: MINIO_ACCESS_KEY
               valueFrom:
@@ -63,15 +68,4 @@ spec:
                   name: local-env
             - name: SERVER_TYPE
               value: server
-          ports:
-            - containerPort: 3000
-              protocol: TCP
-              name: http
-          resources:
-            requests:
-              memory: "256Mi"
-              cpu: "250m"
-            limits:
-              memory: "512Mi"
-              cpu: "500m"
       restartPolicy: Always
