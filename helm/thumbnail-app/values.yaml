@@ -1,0 +1,51 @@
+api:
+  replicas: 2
+  image:
+    repository: thumbnail-api
+    tag: latest
+    pullPolicy: IfNotPresent
+  ports:
+    containerPort: 3000
+    protocol: TCP
+    name: http
+  restartPolicy: Always
+
+service:
+  type: LoadBalancer
+  ports:
+    name: http
+    port: 3000
+    targetPort: 3000
+
+containers:
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+env:
+  MINIO_ACCESS_KEY:
+    key: MINIO_ACCESS_KEY
+    name: local-env
+  MINIO_ENDPOINT:
+    key: MINIO_ENDPOINT
+    name: local-env
+  MINIO_PORT:
+    key: MINIO_PORT
+    name: local-env
+  MINIO_SECRET_KEY:
+    key: MINIO_SECRET_KEY
+    name: local-env
+  MINIO_USE_SSL:
+    key: MINIO_USE_SSL
+    name: local-env
+  MONGOMS_ARCH:
+    key: MONGOMS_ARCH
+    name: local-env
+  MONGO_URL:
+    key: MONGO_URL
+    name: local-env
+  SERVER_TYPE:
+    value: server

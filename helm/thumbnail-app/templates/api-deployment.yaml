@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: api
+  name: api
+  namespace: default
+spec:
+  replicas: {{ .Values.api.replicas }}
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+        - name: api
+          image: {{ .Values.api.image.repository }}:{{ .Values.api.image.tag }}
+          imagePullPolicy: {{ .Values.api.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.api.ports.containerPort }}
+              protocol: {{ .Values.api.ports.protocol }}
+              name: {{ .Values.api.ports.name }}
+          resources:
+            requests:
+              memory: {{ .Values.containers.resources.requests.memory }}
+              cpu: {{ .Values.containers.resources.requests.cpu }}
+            limits:
+              memory: {{ .Values.containers.resources.limits.memory }}
+              cpu: {{ .Values.containers.resources.limits.cpu }}
+          env:
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                configMapKeyRef:
+                  key: {{ .Values.env.MINIO_ACCESS_KEY.key }}
+                  name: {{ .Values.env.MINIO_ACCESS_KEY.name }}
+            - name: MINIO_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  key: {{ .Values.env.MINIO_ENDPOINT.key }}
+                  name: {{ .Values.env.MINIO_ENDPOINT.name }}
+            - name: MINIO_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: {{ .Values.env.MINIO_PORT.key }}
+                  name: {{ .Values.env.MINIO_PORT.name }}
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                configMapKeyRef:
+                  key: {{ .Values.env.MINIO_SECRET_KEY.key }}
+                  name: {{ .Values.env.MINIO_SECRET_KEY.name }}
+            - name: MINIO_USE_SSL
+              valueFrom:
+                configMapKeyRef:
+                  key: {{ .Values.env.MINIO_USE_SSL.key }}
+                  name: {{ .Values.env.MINIO_USE_SSL.name }}
+            - name: MONGOMS_ARCH
+              valueFrom:
+                configMapKeyRef:
+                  key: {{ .Values.env.MONGOMS_ARCH.key }}
+                  name: {{ .Values.env.MONGOMS_ARCH.name }}
+            - name: MONGO_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: {{ .Values.env.MONGO_URL.key }}
+                  name: {{ .Values.env.MONGO_URL.name }}
+            - name: SERVER_TYPE
+              value: {{ .Values.env.SERVER_TYPE.value }}
+      restartPolicy: {{ .Values.api.restartPolicy}}
