@@ -1,0 +1,26 @@
+# Added roles in an attemtp to debug issues with Prometheus not scraping ServiceMonitors
+# This file contains the RBAC roles and role bindings for Prometheus to access ServiceMonitors
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ .Values.roles.prometheus.name }}
+  namespace: {{ .Values.roles.prometheus.namespace }}
+rules:
+  - apiGroups: {{ .Values.roles.prometheus.rules.apiGroups }}
+    resources: {{ .Values.roles.prometheus.rules.resources }}
+    verbs: {{ .Values.roles.prometheus.rules.verbs }}
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ .Values.rolebindings.prometheus.name }}
+  namespace: {{ .Values.rolebindings.prometheus.namespace }}
+subjects:
+  - kind: ServiceAccount
+    name: prometheus-kube-prometheus-prometheus
+    namespace: prometheus
+roleRef:
+  kind: Role
+  name: {{ .Values.roles.prometheus.name }}
+  apiGroup: rbac.authorization.k8s.io

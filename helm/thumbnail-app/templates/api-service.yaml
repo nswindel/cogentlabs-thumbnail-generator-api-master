@@ -9,8 +9,8 @@ metadata:
 spec:
   selector:
     app: api
-  type: {{ .Values.service.type }}
+  type: {{ .Values.apiService.type }}
   ports:
-    - name: {{ .Values.service.ports.name }}
-      port: {{ .Values.service.ports.port }}
-      targetPort: {{ .Values.service.targetPort }}
+    - name: {{ .Values.apiService.ports.name }}
+      port: {{ .Values.apiService.ports.port }}
+      targetPort: {{ .Values.apiService.targetPort }}

@@ -10,12 +10,41 @@ api:
     name: http
   restartPolicy: Always
 
-service:
+apiService:
   type: LoadBalancer
   ports:
     name: http
     port: 3000
     targetPort: 3000
+
+apiServiceMonitor:
+  matchLabels:
+    app: api
+  endpoints:
+    port: http
+    interval: 60s
+
+roles:
+  prometheus:
+    name: prometheus-role
+    namespace: default
+    rules:
+      apiGroups: ["monitoring.coreos.com"]
+      resources: ["servicemonitors"]
+      verbs: ["get", "list", "watch"]
+
+rolebindings:
+  prometheus:
+    name: prometheus-rolebinding
+    namespace: default
+    subjects:
+      kind: ServiceAccount
+      name: prometheus-kube-prometheus-prometheus
+      namespace: prometheus
+    roleRef:
+      kind: Role
+      name: prometheus-role
+      apiGroup: rbac.authorization.k8s.io
 
 containers:
   resources:
