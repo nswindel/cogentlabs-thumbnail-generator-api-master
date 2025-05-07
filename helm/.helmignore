@@ -1,0 +1,4 @@
+.git/
+.gitignore
+# Common backup files
+*.orig

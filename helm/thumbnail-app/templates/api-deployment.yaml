@@ -15,6 +15,17 @@ spec:
       labels:
         app: api
     spec:
+      initContainers:
+        # Wait for s3/db services to be up, otherwise the api service fails to connect to it.
+        # This is a workaround for the issue where the api service fails to connect to the task service
+        # when the task service is not up yet.
+        # Or simply restart the container until the task service is up.
+        - name: wait-for-s3
+          image: busybox
+          command: ['sh', '-c', 'nslookup s3; until nc -z s3 9000; do echo waiting for s3...; sleep 60; done']
+        - name: wait-for-db
+          image: busybox
+          command: ['sh', '-c', 'nslookup db; until nc -z db 27017; do echo waiting for db...; sleep 60; done'] 
       containers:
         - name: api
           image: {{ .Values.api.image.repository }}:{{ .Values.api.image.tag }}

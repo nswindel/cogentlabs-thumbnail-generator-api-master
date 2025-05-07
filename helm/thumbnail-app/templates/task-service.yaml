@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: task
+  name: task
+spec:
+  ports:
+    - name: "3000"
+      port: {{ .Values.taskService.ports.port }}
+      targetPort: {{ .Values.taskService.targetPort }}
+  selector:
+    app: task

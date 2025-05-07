@@ -78,3 +78,31 @@ env:
     name: local-env
   SERVER_TYPE:
     value: server
+  SERVER_TYPE_WORKER:
+    value: worker
+
+task:
+  replicas: 1
+  image:
+    repository: thumbnail-task
+    tag: latest
+    pullPolicy: IfNotPresent
+  ports:
+    containerPort: 3000
+    protocol: TCP
+    name: http
+  restartPolicy: Always
+
+taskService:
+  ports:
+    name: http
+    port: 3000
+    targetPort: 3000
+
+s3Service:
+  ports:
+    name: http
+    port: 9000
+    targetPort: 9000
+  selector:
+    app: s3
