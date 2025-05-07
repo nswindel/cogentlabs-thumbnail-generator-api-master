@@ -99,6 +99,18 @@ taskService:
     port: 3000
     targetPort: 3000
 
+s3:
+  replicas: 1
+  image:
+    repository: minio/minio
+    tag: latest
+    pullPolicy: Always
+  ports:
+    containerPort: 9000
+    protocol: TCP
+    name: http
+  restartPolicy: Always
+
 s3Service:
   ports:
     name: http

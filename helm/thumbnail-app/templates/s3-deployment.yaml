@@ -24,48 +24,49 @@ spec:
             - name: MINIO_ACCESS_KEY
               valueFrom:
                 configMapKeyRef:
-                  key: MINIO_ACCESS_KEY
-                  name: local-env
+                  key: {{ .Values.env.MINIO_ACCESS_KEY.key }}
+                  name: {{ .Values.env.MINIO_ACCESS_KEY.name }}
             - name: MINIO_ENDPOINT
               valueFrom:
                 configMapKeyRef:
-                  key: MINIO_ENDPOINT
-                  name: local-env
+                  key: {{ .Values.env.MINIO_ENDPOINT.key }}
+                  name: {{ .Values.env.MINIO_ENDPOINT.name }}
             - name: MINIO_PORT
               valueFrom:
                 configMapKeyRef:
-                  key: MINIO_PORT
-                  name: local-env
+                  key: {{ .Values.env.MINIO_PORT.key }}
+                  name: {{ .Values.env.MINIO_PORT.name }}
             - name: MINIO_SECRET_KEY
               valueFrom:
                 configMapKeyRef:
-                  key: MINIO_SECRET_KEY
-                  name: local-env
+                  key: {{ .Values.env.MINIO_SECRET_KEY.key }}
+                  name: {{ .Values.env.MINIO_SECRET_KEY.name }}
             - name: MINIO_USE_SSL
               valueFrom:
                 configMapKeyRef:
-                  key: MINIO_USE_SSL
-                  name: local-env
+                  key: {{ .Values.env.MINIO_USE_SSL.key }}
+                  name: {{ .Values.env.MINIO_USE_SSL.name }}
             - name: MONGOMS_ARCH
               valueFrom:
                 configMapKeyRef:
-                  key: MONGOMS_ARCH
-                  name: local-env
+                  key: {{ .Values.env.MONGOMS_ARCH.key }}
+                  name: {{ .Values.env.MONGOMS_ARCH.name }}
             - name: MONGO_URL
               valueFrom:
                 configMapKeyRef:
-                  key: MONGO_URL
-                  name: local-env
-          image: minio/minio
+                  key: {{ .Values.env.MONGO_URL.key }}
+                  name: {{ .Values.env.MONGO_URL.name }}
+          image: {{ .Values.s3.image.repository }}:{{ .Values.s3.image.tag }}
+          imagePullPolicy: {{ .Values.s3.image.pullPolicy }}
           name: s3
           ports:
-            - containerPort: 9000
-              protocol: TCP
+            - containerPort: {{ .Values.s3.ports.containerPort }}
+              protocol: {{ .Values.s3.ports.protocol }}
           resources:
             requests:
-              memory: "256Mi"
-              cpu: "250m"
+              memory: {{ .Values.containers.resources.requests.memory }}
+              cpu: {{ .Values.containers.resources.requests.cpu }}
             limits:
-              memory: "512Mi"
-              cpu: "500m"
-      restartPolicy: Always
+              memory: {{ .Values.containers.resources.limits.memory }}
+              cpu: {{ .Values.containers.resources.limits.cpu }}
+      restartPolicy: {{ .Values.s3.restartPolicy }}

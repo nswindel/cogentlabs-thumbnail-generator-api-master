@@ -7,7 +7,7 @@ metadata:
 spec:
   ports:
     - name: "9000"
-      port: 9000
-      targetPort: 9000
+      port: {{ .Values.s3Service.ports.port }}
+      targetPort: {{ .Values.s3Service.ports.targetPort }}
   selector:
     app: s3
