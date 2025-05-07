@@ -17,21 +17,23 @@ spec:
         app: db
     spec:
       containers:
-        - image: mongo
+        - image: {{ .Values.db.image.repository }}:{{ .Values.db.image.tag }}
           name: db
           ports:
-            - containerPort: 27017
+            - containerPort: {{ .Values.db.ports.containerPort }}
+              name: mongo
+              protocol: {{ .Values.db.ports.protocol }}
           volumeMounts:
             - mountPath: /data/db
               name: mongo-storage
           resources:
             requests:
-              memory: "256Mi"
-              cpu: "250m"
+              memory: {{ .Values.containers.resources.requests.memory }}
+              cpu: {{ .Values.containers.resources.requests.cpu }}
             limits:
-              memory: "512Mi"
-              cpu: "500m"
-      restartPolicy: Always
+              memory: {{ .Values.containers.resources.limits.memory }}
+              cpu: {{ .Values.containers.resources.limits.cpu }}
+      restartPolicy: {{ .Values.db.restartPolicy }}
       volumes:
         - name: mongo-storage
           persistentVolumeClaim:

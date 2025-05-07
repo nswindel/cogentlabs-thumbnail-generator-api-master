@@ -118,3 +118,22 @@ s3Service:
     targetPort: 9000
   selector:
     app: s3
+
+db:
+  replicas: 1
+  image:
+    repository: mongo
+    tag: latest
+    pullPolicy: Always
+  ports:
+    containerPort: 27017
+    protocol: TCP
+  restartPolicy: Always
+
+dbService:
+  ports:
+    port: 27017
+    targetPort: 27017
+    protocol: TCP
+  selector:
+    app: db
