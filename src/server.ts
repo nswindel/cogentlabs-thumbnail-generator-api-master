@@ -31,6 +31,12 @@ const non200Responses = new client.Counter({
   labelNames: ['method', 'route', 'code'],
 });
 
+const failedResponses = new client.Counter({
+  name: 'http_failed_responses_total',
+  help: 'Total number of HTTP responses where app returned status: failed',
+  labelNames: ['method', 'route'],
+});
+
 function withMetrics(routePath: string, handler: (req: Request, res: Response) => void) {
   return (req: Request, res: Response) => {
     const end = httpRequestDurationMilliseconds.startTimer();
@@ -59,15 +65,40 @@ app.get('/health', withMetrics('/health', async (_req, res) => {
 // Thumbnail controller
 app.use('/thumbnail', (req, res, next) => {
   const end = httpRequestDurationMilliseconds.startTimer();
+  const originalSend = res.send.bind(res);
+
+  res.send = function (body) {
+    try {
+      const routePath = `/thumbnail${req.route?.path || ''}`;
+
+      // Increment counter even before sending
+      totalHttpRequests.inc({ method: req.method, route: routePath });
+
+      if (res.statusCode !== 200) {
+        non200Responses.inc({ method: req.method, route: routePath, code: res.statusCode.toString() });
+      }
+
+      // Inspect body if JSON
+      let json;
+      if (typeof body === 'string') {
+        json = JSON.parse(body);
+      } else if (typeof body === 'object') {
+        json = body;
+      }
+
+      if (json?.data?.status?.toLowerCase() !== 'complete') {
+        failedResponses.inc({ method: req.method, route: routePath });
+      }
+    } catch (err) {
+      console.warn('Error parsing response for metrics:', err.message);
+    }
+
+    return originalSend(body);
+  };
+
   res.on('finish', () => {
     const routePath = `/thumbnail${req.route?.path || ''}`;
     end({ method: req.method, route: routePath, code: res.statusCode.toString() });
-    // Increment the total HTTP requests counter
-    totalHttpRequests.inc({ method: req.method, route: routePath });
-    // Increment the non-200 responses counter if the status code is not 200
-    if (res.statusCode !== 200) {
-      non200Responses.inc({ method: req.method, route: routePath, code: res.statusCode.toString() });
-    }
   });
   next();
 }, thumbnailRoutes);
