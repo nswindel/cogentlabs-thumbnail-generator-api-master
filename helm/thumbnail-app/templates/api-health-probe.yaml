@@ -1,0 +1,19 @@
+# This file defines a Kubernetes Pod that runs a health probe for the API service.
+# Just used to generate metrics for the API service.
+# Better approach would be to actually make a request to the API service and check the response.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: api-health-prober
+spec:
+  containers:
+    - name: curl-prober
+      image: curlimages/curl:latest
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          while true; do
+            echo "$(date) - Probing api:3000/health"
+            curl -s -o /dev/null -w "%{http_code}\n" http://api:3000/health
+            sleep 60
+          done
