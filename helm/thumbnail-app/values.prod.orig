@@ -1,0 +1,3 @@
+# Placeholder for prod values
+# This file is used to override the default values in the chart
+# It is used to deploy the application in a prod stage environment using stage $ENV variable
