@@ -12,6 +12,8 @@ const client = require('prom-client');
 client.collectDefaultMetrics();
 const register = client.register;
 
+// These metrics would move to its own metric helper and be imported
+// and then reused in other files
 const httpRequestDurationMilliseconds = new client.Histogram({
   name: 'http_request_duration_milliseconds',
   help: 'Duration of HTTP requests in milliseconds',
@@ -37,6 +39,7 @@ const failedResponses = new client.Counter({
   labelNames: ['method', 'route'],
 });
 
+// As above, would move this to its own metric helper and be imported and re-used
 function withMetrics(routePath: string, handler: (req: Request, res: Response) => void) {
   return (req: Request, res: Response) => {
     const end = httpRequestDurationMilliseconds.startTimer();
@@ -85,7 +88,9 @@ app.use('/thumbnail', (req, res, next) => {
       } else if (typeof body === 'object') {
         json = body;
       }
-
+      // Check if the response contains a failed status
+      // This is a little hacky, and results in emitting doulbe metrics due to the call inside the route/thumbnails
+      // Would move the metric emission elsewhere
       if (json?.data?.status?.toLowerCase() === 'failed') {
         failedResponses.inc({ method: req.method, route: routePath });
       }

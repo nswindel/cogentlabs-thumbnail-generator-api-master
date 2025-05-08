@@ -137,3 +137,8 @@ dbService:
     protocol: TCP
   selector:
     app: db
+
+prometheus:
+  prometheusSpec:
+    ruleNamespaceSelector: {}
+    ruleSelector: {}

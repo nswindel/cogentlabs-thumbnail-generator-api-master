@@ -1,0 +1,38 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: availability-alerts
+  namespace: prometheus
+  labels:
+    release: prometheus
+    role: alert-rules
+spec:
+  groups:
+    - name: api-availability.rules
+      rules:
+        - alert: ServiceUnavailbility
+          expr: |
+            (sum(rate(http_requests_non_200_total[5m])) / sum(rate(http_requests_total[5m]))) > 0.10
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High http non-200 request rate detected"
+            description: "More than 10% of requests are failing"
+        - alert: HighErrorRate
+          expr: |
+            (sum(rate(http_failed_responses_total[5m])/2) / sum(rate(http_requests_total[5m]))) > 0.05
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High error rate detected"
+            description: "More than 5% of requests are failing"
+        - alert: ServiceDown
+          expr: up{job="api"} == 0
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Service is down"
+            description: "No targets reporting for the last 2 minutes"
