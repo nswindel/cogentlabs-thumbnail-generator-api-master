@@ -86,7 +86,7 @@ app.use('/thumbnail', (req, res, next) => {
         json = body;
       }
 
-      if (json?.data?.status?.toLowerCase() !== 'complete') {
+      if (json?.data?.status?.toLowerCase() === 'failed') {
         failedResponses.inc({ method: req.method, route: routePath });
       }
     } catch (err) {
