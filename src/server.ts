@@ -12,6 +12,24 @@ const client = require('prom-client');
 client.collectDefaultMetrics();
 const register = client.register;
 
+const httpRequestDurationMilliseconds = new client.Histogram({
+  name: 'node_request_duration_milliseconds',
+  help: 'Duration of HTTP requests in milliseconds',
+  labelNames: ['method', 'route', 'code'],
+  buckets: [50, 100, 200, 300, 400, 500, 1000],
+});
+
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on('finish', () => {
+    const responseTimeInMilliseconds = Date.now() - start;
+    httpRequestDurationMilliseconds
+      .labels(req.method, req.route?.path)
+      .observe(responseTimeInMilliseconds);
+  });
+  next()
+});
+
 // Metrics endpoint
 app.get('/metrics', async (req, res) => {
   res.set('Content-Type', register.contentType);
