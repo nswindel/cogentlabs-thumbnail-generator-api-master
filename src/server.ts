@@ -57,7 +57,7 @@ app.get('/metrics', async (req, res) => {
 });
 
 app.get('/', withMetrics('/', (_: Request, res: Response) => {
-  res.status(200).send({ data: 'Hello from Thumbnail Generator' });
+  res.status(200).send({ data: 'Hello from Thumbnail Generator v1.0.2' });
 }));
 
 // Health check endpoint

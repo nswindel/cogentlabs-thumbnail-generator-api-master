@@ -2,7 +2,7 @@ api:
   replicas: 2
   image:
     repository: thumbnail-api
-    tag: v1.0.0
+    tag: v1.0.2
     pullPolicy: IfNotPresent
   ports:
     containerPort: 3000
@@ -85,7 +85,7 @@ task:
   replicas: 1
   image:
     repository: thumbnail-task
-    tag: v1.0.0
+    tag: v1.0.2
     pullPolicy: IfNotPresent
   ports:
     containerPort: 3000
