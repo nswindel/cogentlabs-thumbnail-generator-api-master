@@ -28,11 +28,11 @@ spec:
           annotations:
             summary: "High error rate detected"
             description: "More than 5% of requests are failing"
-        - alert: ServiceDown
-          expr: up{job="api"} == 0
+        - alert: TargetUnavailabilityRate
+          expr: 100 * (avg_over_time(up{job="api", namespace="default"}[5m])) < 60
           for: 2m
           labels:
             severity: critical
           annotations:
-            summary: "Service is down"
-            description: "No targets reporting for the last 2 minutes"
+            summary: "Target availability below 60%"
+            description: "Average availability of targets is below 60% over the last 5 minutes"
