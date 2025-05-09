@@ -34,6 +34,19 @@ spec:
             - containerPort: {{ .Values.api.ports.containerPort }}
               protocol: {{ .Values.api.ports.protocol }}
               name: {{ .Values.api.ports.name }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
           resources:
             requests:
               memory: {{ .Values.containers.resources.requests.memory }}
