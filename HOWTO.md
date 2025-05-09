@@ -6,7 +6,7 @@ Thumbnail-generator is a JSON-based REST API service which resizes images into 1
 
 This kubernetes cluster is built and deployed using minikube for local development and includes:
 
-- API Service / Express: Server libary for node.
+- API Service / Express: Server library for node.
 - Minio: S3 compatible API, used with the minio docker image.
 - Agenda: Background jobs/queue, lightweight and works with mongo.
 - MongoDB: Backend database that connects with Agenda. 
@@ -44,7 +44,7 @@ minikube start --driver=kvm2
 eval $(minikube docker-env)
 ```
 
-- Output should resemlbe the following:
+- Output should resemble the following:
 ```
 $ minikube start --driver=kvm2
 😄  minikube v1.35.0 on Ubuntu 24.04
@@ -99,7 +99,7 @@ docker build -t thumbnail-task:v1.0.0 .
 $ minikube ssh
 ```
 
-- Confirm the images are availble:
+- Confirm the images are available:
 ```
 $ docker images | grep thumbnail | grep v1
 thumbnail-api                                            v1.0.0     e1960635155d   14 hours ago    672MB
@@ -109,11 +109,11 @@ $
 
 # Deploying the service
 
-The applicaitons are deployed using helm.
+The applications are deployed using helm.
 
 ## Monitoring stack
 
-1. Install the promethues stack using the community Helm chart.
+1. Install the prometheus stack using the community Helm chart.
 
 ```
 helm install prometheus prometheus-community/kube-prometheus-stack --namespace=prometheus --create-namespace --wait
@@ -131,7 +131,7 @@ prometheus-prometheus-node-exporter-pq2kd                1/1     Running   1 (32
 $
 ```
 
-2. Make prometheus and grafana availble externally to the minikube server by forwarding the relevant ports:
+2. Make prometheus and grafana available externally to the minikube server by forwarding the relevant ports:
 ```
 $ kubectl port-forward service/prometheus-prometheus-node-exporter 9100 --namespace=prometheus &
 Forwarding from 127.0.0.1:9100 -> 9100
@@ -144,14 +144,14 @@ Forwarding from 127.0.0.1:3000 -> 3000
 Forwarding from [::1]:3000 -> 3000
 ```
 
-3. Ensure promethues and grafana is accessible from the browser:
+3. Ensure prometheus and grafana is accessible from the browser:
 
-- Promethues: http://localhost:9090/query
+- Prometheus: http://localhost:9090/query
 - Grafana: http://localhost:3000 
 
 ## Thumbnail app
 
-1. Confirm you are in the helm direcotry of the project, then install thumbnail app:
+1. Confirm you are in the helm directory of the project, then install thumbnail app:
 
 ```
 $ tree helm -L 1 -d
@@ -245,7 +245,7 @@ $ curl --location --request GET "http://${IP}:3000/thumbnail/ab67e0db-3f6c-4eca-
 
 Prometheus scrapes api metrics from both thumbnail-api/metrics and node exporter via the daemonset.
 
-## Verfiy api service targets are up in prometheus
+## Verify api service targets are up in prometheus
 
 Confirm the targets are up by visiting the prometheus dashboard: http://localhost:9090/targets. You cna also verify via the cli.
 
@@ -332,11 +332,11 @@ A simple health probe pod exists for the api service which is used just to gener
 InitContainers exist on the follow services:
 
 - api: db and s3 services. 
-  Note: I've put in a hack by intially sleeping for 30 seconds to avoid race conditions with the task service. It appeared everytime the api service started prior to the task service, I always encountered netowkr connectivity issues in the stack. 
+  Note: I've put in a hack by initially sleeping for 30 seconds to avoid race conditions with the task service. It appeared every time the api service started prior to the task service, I always encountered network connectivity issues in the stack. 
 
 - task: db and s3 services. The check iterates quicker than the api initContainers
 
-Output during hem install shows api deploys after task (although not always gauranteed)
+Output during hem install shows api deploys after task (although not always guaranteed)
 ```
 $ kubectl get pod
 NAME                   READY   STATUS            RESTARTS   AGE
@@ -349,7 +349,7 @@ task-df7dc65bc-szq8d   0/1     PodInitializing   0          28s
 $
 ```
 
-Task runng before api pods are `Running` , with `api-health-probe` waiting on api pod:
+Task running before api pods are `Running` , with `api-health-probe` waiting on api pod:
 ```
 $ kubectl get pod
 NAME                   READY   STATUS     RESTARTS   AGE
@@ -377,7 +377,7 @@ Prometheus Histogram & Counters include:
 
    Any response with "failed" returned back to the server.ts emits a metric counter. 
    Not the ideal solution and it should be captured within the route itself, not on `GET` requests. 
-   It would also require implementation of categorizing other status != `complete`, however this is just for inital testing and as a first pass it's useful for testing the HighErrorRate alert.
+   It would also require implementation of categorizing other status != `complete`, however this is just for initial testing and as a first pass it's useful for testing the HighErrorRate alert.
 
    ```
    http_failed_responses_total{method="GET",route="/thumbnail/:id"} 4
@@ -388,7 +388,7 @@ Application/node metrics available at http://<pod-ip>:3000/metrics.
 
 Availability monitor is defined, with the following rules/alerts being created:
 
-1. Name: ServiceAvailibity which is measured as a percentage of successful requests ie http response 200. 
+1. Name: ServiceAvailability which is measured as a percentage of successful requests ie http response 200. 
    Definition: 
    ```
    (sum(rate(http_requests_non_200_total[5m])) / sum(rate(http_requests_total[5m]))) > 0.1
@@ -407,7 +407,7 @@ Availability monitor is defined, with the following rules/alerts being created:
 
 #### Trigger the HighErrorRate alret
 
-As mentioned above, doing a simple `GET` on a job which has a return status of "failed" will incremente the counter.
+As mentioned above, doing a simple `GET` on a job which has a return status of "failed" will increment the counter.
 
 First, get the api svc IP:
 ```
@@ -416,12 +416,12 @@ NAME         TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
 api          LoadBalancer   10.98.214.33     <pending>     3000:30431/TCP   7m7s
 ```
 
-Execute the following with posts a bad image to the api, and the `GET` will incremete the counter:
+Execute the following with posts a bad image to the api, and the `GET` will increment the counter:
 ```
 IP=10.98.214.33 ; echo $IP ; echo " " ; x=0 ; while [ $x -eq 0 ] ; do echo "Submitting job" ; JOB_ID=`curl --silent --location --request POST "http://${IP}:3000/thumbnail" --form 'file=@"./bad_image_actually_pdf.png"' | cut -d'"' -f6` ; echo " " ; echo "getting $JOB_ID" ; echo " " ; sleep 5 ; curl --location --request GET "http://${IP}:3000/thumbnail/$JOB_ID" ; y=0 ; while [ $y -ne 3 ] ; do echo " " ; echo "Getting health" ; curl "http://${IP}:3000/health" ;  curl "http://${IP}:3000/metrics" | grep -i fail ; echo " " ; y=$(($y + 1)) ; done ; done
 ```
 
-Output after a few mintues:
+Output after a few minutes:
 ```
 # HELP http_failed_responses_total Total number of HTTP responses where app returned status: failed
 # TYPE http_failed_responses_total counter
@@ -439,7 +439,7 @@ http_failed_responses_total{method="GET",route="/thumbnail/:id"} 82
 
 # Updating the api deployment
 
-- As a test, upate the '/' path response in `src/server.ts` with the new version  
+- As a test, update the '/' path response in `src/server.ts` with the new version.
 ```
 res.status(200).send({ data: 'Hello from Thumbnail Generator v1.0.2' });
 ```
@@ -463,7 +463,7 @@ docker build -t thumbnail-api:v1.0.2 .
 docker build -t thumbnail-task:v1.0.2 .
 ```
 
-- Connect to your minikube node and verfiy the images are there:
+- Connect to your minikube node and verify the images are there:
 ```
 $ minikube ssh
 $ docker images            

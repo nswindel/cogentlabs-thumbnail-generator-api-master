@@ -10,7 +10,7 @@ spec:
   groups:
     - name: api-availability.rules
       rules:
-        - alert: ServiceUnavailbility
+        - alert: ServiceUnavailability
           expr: |
             (sum(rate(http_requests_non_200_total[5m])) / sum(rate(http_requests_total[5m]))) > 0.10
           for: 2m

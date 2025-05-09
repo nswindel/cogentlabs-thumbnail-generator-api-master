@@ -1,4 +1,4 @@
-# Added roles in an attemtp to debug issues with Prometheus not scraping ServiceMonitors
+# Added roles in an attempt to debug issues with Prometheus not scraping ServiceMonitors
 # This file contains the RBAC roles and role bindings for Prometheus to access ServiceMonitors
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
