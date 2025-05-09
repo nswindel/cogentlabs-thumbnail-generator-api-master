@@ -6,6 +6,26 @@ kind: Pod
 metadata:
   name: api-health-prober
 spec:
+  restartPolicy: Always
+  terminationGracePeriodSeconds: 3
+  initContainers:
+  - name: wait-for-api
+    image: curlimages/curl:latest
+    command:
+      - sh
+      - -c
+      - |
+        echo "Waiting for API to become available..."
+        for i in $(seq 1 30); do
+          if curl -sf --connect-timeout 2 --max-time 5 http://api:3000/health; then
+            echo "API is available!"
+            exit 0
+          fi
+          echo "Attempt $i: API not ready, retrying in 3s..."
+          sleep 3
+        done
+        echo "API not available after 30 attempts. Exiting."
+        exit 1
   containers:
     - name: curl-prober
       image: curlimages/curl:latest

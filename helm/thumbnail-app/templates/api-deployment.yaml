@@ -22,10 +22,10 @@ spec:
         # Or simply restart the container until the task service is up.
         - name: wait-for-s3
           image: busybox
-          command: ['sh', '-c', 'sleep 10 ; nslookup s3; until nc -z s3 9000; do echo waiting for s3...; sleep 15; done']
+          command: ['sh', '-c', 'sleep 30; nslookup s3; until nc -z s3 9000; do echo waiting for s3...; sleep 15; done']
         - name: wait-for-db
           image: busybox
-          command: ['sh', '-c', 'sleep 10 ; nslookup db; until nc -z db 27017; do echo waiting for db...; sleep 15; done'] 
+          command: ['sh', '-c', 'sleep 30; nslookup db; until nc -z db 27017; do echo waiting for db...; sleep 15; done'] 
       containers:
         - name: api
           image: {{ .Values.api.image.repository }}:{{ .Values.api.image.tag }}
